@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'npm install'
+                sh 'npm run build'  // Poprawiono na npm run build
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'docker build -t myregistry/myapp:latest .'  // Zmieniono nazwę obrazu
+                sh 'docker push myregistry/myapp:latest'      // Zmieniono nazwę obrazu
+            }
+            when {
+                branch 'master'
+            }
+        }
+    }
+    post {
+        always {
+            // Można dodać np. czyszczenie zasobów
+            echo 'Pipeline zakończony'
+        }
+        success {
+            // Można dodać akcje po pomyślnym zakończeniu pipeline
+            echo 'Deploy zakończony pomyślnie!'
+        }
+        failure {
+            // Można dodać akcje w przypadku niepowodzenia
+            echo 'Wystąpił błąd w pipeline!'
+        }
+    }
+}
