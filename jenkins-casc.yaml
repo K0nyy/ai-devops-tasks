@@ -1,0 +1,83 @@
+jenkins:
+  # Podstawowe ustawienia Jenkins
+  numExecutors: 4  # Liczba wykonawców
+  quietPeriod: 5   # Okres ciszy przed uruchomieniem jobów (w sekundach)
+  timeout:
+    # Ustawienia czasu oczekiwania na zadania
+    absolute: 3600 # Czas oczekiwania na zadania w sekundach (1 godzina)
+  
+  # Globalny katalog narzędzi
+  tool:
+    maven:
+      installations:
+        - name: "Maven 3.8.1"
+          home: "/usr/local/maven"
+    nodejs:
+      installations:
+        - name: "Node.js 14.x"
+          home: "/usr/local/nodejs"
+    docker:
+      installations:
+        - name: "Docker 20.10"
+          home: "/usr/local/bin/docker"
+
+  # Wtyczki
+  plugins:
+    - kubernetes: "1.29.7"
+    - pipeline-model-definition: "1.10.1"
+    - git: "4.8.2"
+    - blueocean: "1.24.6"
+    - credentials-binding: "1.28"
+
+  # Przykładowe zadanie typu pipeline
+  jobs:
+    - script:
+        name: "example-pipeline"
+        description: "Przykładowe zadanie pipeline"
+        pipeline:
+          definition: 
+            cps:
+              script: |
+                pipeline {
+                    agent any
+
+                    environment {
+                        MAVEN_HOME = tool 'Maven 3.8.1'
+                        NODEJS_HOME = tool 'Node.js 14.x'
+                    }
+
+                    stages {
+                        stage('Checkout') {
+                            steps {
+                                checkout scm
+                            }
+                        }
+                        stage('Build with Maven') {
+                            steps {
+                                script {
+                                    sh "${MAVEN_HOME}/bin/mvn clean install"
+                                }
+                            }
+                        }
+                        stage('Test with Node.js') {
+                            steps {
+                                script {
+                                    sh "${NODEJS_HOME}/bin/npm install"
+                                    sh "${NODEJS_HOME}/bin/npm test"
+                                }
+                            }
+                        }
+                        stage('Docker Build') {
+                            steps {
+                                script {
+                                    sh "docker build -t my-image:${BUILD_NUMBER} ."
+                                }
+                            }
+                        }
+                        stage('Deploy') {
+                            steps {
+                                echo "Deploying application..."
+                            }
+                        }
+                    }
+                }
