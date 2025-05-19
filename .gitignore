@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Docker
+docker-compose.override.yml
+Dockerfile*
+.docker/
+docker/.env
+
+# MongoDB (dane bazy danych)
+mongodb_data/
+
+# Systemy operacyjne
+.DS_Store
+Thumbs.db
+
+# IDE i edytory kodu
+.idea/
+.vscode/
+
+# Zostawiamy plik .env, jeśli nie zawiera danych wrażliwych
+.env
+
+# Przypadkowe pliki
+*.log
